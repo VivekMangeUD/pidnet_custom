@@ -11,7 +11,7 @@ from PIL import Image
 import torch
 from .base_dataset import BaseDataset
 
-class Cityscapes(BaseDataset):
+class Mapillary(BaseDataset):
     def __init__(self, 
                  root, 
                  list_path,
@@ -26,7 +26,7 @@ class Cityscapes(BaseDataset):
                  std=[0.229, 0.224, 0.225],
                  bd_dilate_size=4):
 
-        super(Cityscapes, self).__init__(ignore_label, base_size,
+        super(Mapillary, self).__init__(ignore_label, base_size,
                 crop_size, scale_factor, mean, std,)
 
         self.root = root
@@ -56,8 +56,17 @@ class Cityscapes(BaseDataset):
                                         1.0166, 0.9969, 0.9754, 1.0489,
                                         0.8786, 1.0023, 0.9539, 0.9843, 
                                         1.1116, 0.9037, 1.0865, 1.0955, 
-                                        1.0865, 1.1529, 1.0507]).cuda()
+                                        1.0865, 1.1529, 1.0507])
+        self.ignore_label = ignore_label
         
+        self.color_list = [[0, 128, 192], [128, 0, 0], [64, 0, 128],
+                             [192, 192, 128], [64, 64, 128], [64, 64, 0],
+                             [128, 64, 128], [0, 0, 192], [192, 128, 128],
+                             [128, 128, 128], [128, 128, 0]]
+        
+        self.class_weights = None
+        
+
         self.bd_dilate_size = bd_dilate_size
     
     def read_files(self):
@@ -94,10 +103,11 @@ class Cityscapes(BaseDataset):
 
     def __getitem__(self, index):
         item = self.files[index]
-        print(item)
+        # print(item)
 
         name = item["name"]
-        image = cv2.imread(os.path.join(self.root,'cityscapes',item["img"]),
+        print(os.path.join(self.root,'mapillary',item["img"]))
+        image = cv2.imread(os.path.join(self.root,'mapillary',item["img"]),
                            cv2.IMREAD_COLOR)
         size = image.shape
 
@@ -106,8 +116,8 @@ class Cityscapes(BaseDataset):
             image = image.transpose((2, 0, 1))
 
             return image.copy(), np.array(size), name
-
-        label = cv2.imread(os.path.join(self.root,'cityscapes',item["label"]),
+        print(os.path.join(self.root,'mapillary',item["label"]))
+        label = cv2.imread(os.path.join(self.root,'mapillary',item["label"]),
                            cv2.IMREAD_GRAYSCALE)
         label = self.convert_label(label)
 

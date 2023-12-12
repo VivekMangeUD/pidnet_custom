@@ -8,7 +8,7 @@ from PIL import Image
 
 from .base_dataset import BaseDataset
 
-class CamVid(BaseDataset):
+class Kitti(BaseDataset):
     def __init__(self, 
                  root, 
                  list_path, 
@@ -23,13 +23,11 @@ class CamVid(BaseDataset):
                  std=[0.229, 0.224, 0.225],
                  bd_dilate_size=4):
 
-        super(CamVid, self).__init__(ignore_label, base_size,
+        super(Kitti, self).__init__(ignore_label, base_size,
                 crop_size, scale_factor, mean, std)
 
         self.root = root
-        print(root)
         self.list_path = list_path
-        print(list_path)
         self.num_classes = num_classes
 
         self.multi_scale = multi_scale
@@ -84,11 +82,11 @@ class CamVid(BaseDataset):
         item = self.files[index]
         # print(item)
         name = item["name"]
-        image = Image.open(os.path.join(self.root,'camvid',item["img"])).convert('RGB')
+        image = Image.open(os.path.join(self.root,'kitti',item["img"])).convert('RGB')
         image = np.array(image)
         size = image.shape
 
-        color_map = Image.open(os.path.join(self.root,'camvid',item["label"])).convert('RGB')
+        color_map = Image.open(os.path.join(self.root,'kitti',item["label"])).convert('RGB')
         color_map = np.array(color_map)
         label = self.color2label(color_map)
 
